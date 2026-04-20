@@ -8,8 +8,7 @@ from config import Config
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = Config.SECRET_KEY
-CORS(app, origins=['http://localhost', 'http://localhost:80'])
-
+CORS(app)
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
