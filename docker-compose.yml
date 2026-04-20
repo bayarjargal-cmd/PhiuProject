@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: web_system_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: web_system
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database:/docker-entrypoint-initdb.d
+    networks:
+      - app_network
+
+  backend:
+    build: ./backend
+    container_name: web_system_backend
+    restart: always
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user123
+      MYSQL_DB: web_system
+      SECRET_KEY: your-secret-key-here
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+    networks:
+      - app_network
+
+  frontend:
+    build: ./frontend
+    container_name: web_system_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+volumes:
+  mysql_data:
+
+networks:
+  app_network:
+    driver: bridge
